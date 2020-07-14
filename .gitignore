@@ -2,3 +2,4 @@
 .idea
 .DS_Store
 __pycache__
+django_firebase/__pycache__
