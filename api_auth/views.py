@@ -4,8 +4,7 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from api_auth.serializers import RegistrationSerializer, LoginSerializer
-
+from api_auth.serializers import SignupSerializer, LoginSerializer
 
 config = {
     'apiKey': "AIzaSyDaqtcp2Z3g5llZNbzOix63ICH7CJ1u6DM",
@@ -22,8 +21,8 @@ f_auth = firebase.auth()
 f_database = firebase.database()
 
 
-class RegisterView(GenericAPIView):
-    serializer_class = RegistrationSerializer
+class SignupView(GenericAPIView):
+    serializer_class = SignupSerializer
 
     def post(self, request):
         data = request.data
@@ -41,6 +40,7 @@ class RegisterView(GenericAPIView):
         try:
             # create authentication info in firebase authentication
             user = f_auth.create_user_with_email_and_password(email, password)
+            print(user)
             uid = user['localId']  # primary key of user
             # push to database -> user/uid/details/data
             f_database.child("users").child(uid).child("details").set(data)
@@ -48,7 +48,7 @@ class RegisterView(GenericAPIView):
             message = "User information has already existed. Please try again."
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = RegistrationSerializer(data)
+        serializer = SignupSerializer(data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

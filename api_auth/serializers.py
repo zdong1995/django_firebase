@@ -4,7 +4,7 @@ from .models import AuthenticatedUser
 
 
 # Serializer for Registration
-class RegistrationSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         data = {
