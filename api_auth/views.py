@@ -48,6 +48,11 @@ class SignupView(GenericAPIView):
             message = "User information has already existed. Please try again."
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            f_auth.send_email_verification(user['idToken'])
+        except:
+            return Response({'detail': 'Invalid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = SignupSerializer(data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -76,3 +81,56 @@ class LoginView(GenericAPIView):
 
         serializer = LoginSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(GenericAPIView):
+
+    def post(self, request):
+        email = request.data.get('email')
+
+        try:
+            f_auth.send_password_reset_email(email)
+        except:
+            return Response({'detail': 'Invalid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Email sent successful to your email. Please reset your password.'},
+                        status=status.HTTP_200_OK)
+
+
+class EmailVerifyView(GenericAPIView):
+
+    def post(self, request):
+        idToken = request.data.get('idToken')
+
+        try:
+            f_auth.send_email_verification(idToken)
+        except:
+            return Response({'detail': 'Invalid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Email sent successful to your email. Please verify your email address.'},
+                        status=status.HTTP_200_OK)
+
+
+class UpdateView(GenericAPIView):
+
+    def post(self, request):
+        data = request.data
+        uid = data.get('localId')
+        del data['localId']
+
+        f_database.child("users").child(uid).child("details").update(data)
+
+        return Response({'message': 'Update successfully.'},
+                        status=status.HTTP_200_OK)
+
+class AddView(GenericAPIView):
+
+    def post(self, request):
+        data = request.data
+        uid = data.get('localId')
+        del data['localId']
+
+        f_database.child("users").child(uid).child("details").update(data)
+
+        return Response({'message': 'Add successfully.'},
+                        status=status.HTTP_200_OK)
