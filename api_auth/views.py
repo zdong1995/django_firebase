@@ -82,9 +82,20 @@ class LoginView(GenericAPIView):
         serializer = LoginSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ResetPaswordView(GenericAPIView):
 
-    pass
+    def post(self, request):
+        email = request.data.get('email')
+
+        try:
+            f_auth.send_password_reset_email(email)
+        except:
+            return Response({'detail': 'Invalid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Email sent successful to your email. Please reset your password.'},
+                        status=status.HTTP_200_OK)
+
 
 class EmailVerifyView(GenericAPIView):
 
