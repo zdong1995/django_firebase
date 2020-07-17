@@ -76,3 +76,19 @@ class LoginView(GenericAPIView):
 
         serializer = LoginSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ResetPaswordView(GenericAPIView):
+
+    pass
+
+class EmailVerifyView(GenericAPIView):
+
+    pass
+
+class UpdateView(GenericAPIView):
+
+    pass
+
+class AddView(GenericAPIView):
+
+    pass
