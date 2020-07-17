@@ -83,7 +83,7 @@ class LoginView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ResetPaswordView(GenericAPIView):
+class ResetPasswordView(GenericAPIView):
 
     def post(self, request):
         email = request.data.get('email')
@@ -113,8 +113,24 @@ class EmailVerifyView(GenericAPIView):
 
 class UpdateView(GenericAPIView):
 
-    pass
+    def post(self, request):
+        data = request.data
+        uid = data.get('localId')
+        del data['localId']
+
+        f_database.child("users").child(uid).child("details").update(data)
+
+        return Response({'message': 'Update successfully.'},
+                        status=status.HTTP_200_OK)
 
 class AddView(GenericAPIView):
 
-    pass
+    def post(self, request):
+        data = request.data
+        uid = data.get('localId')
+        del data['localId']
+
+        f_database.child("users").child(uid).child("details").update(data)
+
+        return Response({'message': 'Add successfully.'},
+                        status=status.HTTP_200_OK)
