@@ -48,6 +48,11 @@ class SignupView(GenericAPIView):
             message = "User information has already existed. Please try again."
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            f_auth.send_email_verification(user['idToken'])
+        except:
+            return Response({'detail': 'Invalid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = SignupSerializer(data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -83,7 +88,17 @@ class ResetPaswordView(GenericAPIView):
 
 class EmailVerifyView(GenericAPIView):
 
-    pass
+    def post(self, request):
+        idToken = request.data.get('idToken')
+
+        try:
+            f_auth.send_email_verification(idToken)
+        except:
+            return Response({'detail': 'Invalid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Email sent successful to your email. Please verify your email address.'},
+                        status=status.HTTP_200_OK)
+
 
 class UpdateView(GenericAPIView):
 
