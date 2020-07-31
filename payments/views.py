@@ -10,7 +10,19 @@ stripe.api_key = 'sk_test_51H5tgoB5uFLcZ9OT4rZWkLsW2VIG6mcLW2wb8sIuk2amm5who22JA
 
 @csrf_exempt
 def add_customer(request):
-    pass
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get("email")
+        name = data.get("name")
+
+        try:
+            response = stripe.Customer.create(name=name, email=email, )
+        except:
+            message = "Customer information has already existed. Please try again."
+            return JsonResponse({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        customer_id = response['id']
+        return JsonResponse({'customer_id': customer_id}, status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt
