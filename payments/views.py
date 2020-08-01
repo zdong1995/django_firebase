@@ -127,12 +127,55 @@ def card(request):
 
 @csrf_exempt
 def list_cards(request):
-    pass
+    if request.method == 'GET':
+        data = json.loads(request.body)
+        customer_id = data.get('customer_id')
+
+        # retrieve customer data
+        customer = stripe.Customer.retrieve(customer_id)
+
+        # extract card information
+        sources = customer.get("sources")
+
+        # the key of sources pair is "data"
+        response = {"Number of Cards": len(sources["data"])}
+
+        i = 1
+
+        for info in sources["data"]:
+            card = info["card"]
+            source_id = info['id']
+            fingerprint = card['fingerprint']
+            brand = card['brand']
+            last4 = card['last4']
+
+            cur_card = {'brand': brand, 'last4': last4,
+                        'source_id': source_id,
+                        'fingerprint': fingerprint
+                        }
+
+            response["card" + str(i)] = cur_card
+            i += 1
+
+        return JsonResponse(response, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
 def default_card(request):
-    pass
+    data = json.loads(request.body)
+    customer_id = data.get('customer_id')
+    source_id = data.get('source_id')
+
+    if request.method == 'POST':
+        del data['customer_id']
+
+        try:
+            stripe.Customer.modify(customer_id, default_source=source_id)
+        except:
+            message = "Card not exists. Please try again."
+            return JsonResponse({'message': message}, status=status.HTTP_404_NOT_FOUND)
+
+        return JsonResponse({'message': "Default card set successfully!"}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
