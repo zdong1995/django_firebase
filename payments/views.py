@@ -180,12 +180,38 @@ def default_card(request):
 
 @csrf_exempt
 def add_charge(request):
-    pass
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        amount = data.get('amount')
+        currency = data.get('currency')
+        source = data.get('source_id')
+        customer = data.get('customer_id')
+
+        response = stripe.Charge.create(amount=int(amount), currency=currency,
+                                        source=source, customer=customer)
+        charge_id = response['id']
+
+        return JsonResponse({'charge_id': charge_id}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
 def charge(request):
-    pass
+    data = json.loads(request.body)
+    charge_id = data.get('charge_id')
+
+    if request.method == 'GET':
+        response = stripe.Charge.retrieve(charge_id)
+
+        dict = {}
+
+        dict["amount"] = response["amount"]
+        dict["currency"] = response["currency"]
+        dict["customer"] = response["customer"]
+        dict["status"] = response["status"]
+        card = response["payment_method_details"]["card"]
+        dict["payment_method"] = {"card_type": card["brand"], "last 4": card["last4"]}
+
+        return JsonResponse(dict, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
