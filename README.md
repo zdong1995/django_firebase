@@ -6,6 +6,7 @@ Backend service REST API for shopping and ordering application based on Django a
 
 - `django_firebase`: main service of application
 - `api_auth`: app for authentication
+- `payment`: app for payment service
 
 ## Project Setup
 
@@ -33,60 +34,45 @@ Follow these steps to create a Django admin (superuser) user account, for the Dj
 
 ### API Endpoints
 
-You can use [postman](https://www.postman.com) to test the api during development.
 
-#### Authentication
+You can use [postman](https://www.postman.com) to test the api during development using the API test collection created by Andy Dong:
 
-- Create new user: `/api/auth/signup`. Verbs: `POST`
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/7deeb5f8342727365897)
 
-You can try `http://127.0.0.1:8000/api/auth/signup` and send json data as example following to test:
 
-```
-{
-    "username": "testuser",
-    "first_name": "Test",
-    "last_name": "User",
-    "email": "testuser@gmail.com",
-    "password1": "password",
-    "password2": "password"
-}
-```
+#### Auth
 
-After validations the service will created user in Firebase Authentication and push data info into Firebase database. The correct response should be like:
-```
-{
-    "username": "testuser",
-    "email": "testuser@gmail.com",
-    "first_name": "Test",
-    "last_name": "User"
-}
-```
+- Create new user: `/api/auth/register`. Verbs: `POST`
+- Login: `/api/auth/login`. Verbs: `POST`
+- Email Verify: `/api/auth/email_verify`. Verbs: `POST`
+- Reset Password: `/api/auth/reset_password`. Verbs: `POST`
+- Update Auth: `/api/auth/update`. Verbs: `POST`
+- Add Info: `/api/auth/add_info`. Verbs: `POST`
 
-- Login existing user: `/api/auth/login`. Verbs: `POST`
+#### Payment - Customer
+- Create a customer: `/api/stripe/customer/add`. Verbs: `POST`
+- Get customer info: `/api/stripe/customer`. Verbs: `GET`
+- Update customer info: `/api/stripe/customer`. Verbs: `POST`
+- Delete customer: `/api/stripe/customer`. Verbs: `DELETE`
 
-You can try `http://127.0.0.1:8000/api/auth/login` and send json data as example following to test:
+#### Payment - Card
+- Add a card: `/api/stripe/card/add`. Verbs: `POST`
+- Get a card info: `/api/stripe/card`. Verbs: `GET`
+- Update card info: `/api/stripe/card`. Verbs: `POST`
+- Delete a card: `/api/stripe/card`. Verbs: `DELETE`
+- Get all cards of one customer: `/api/stripe/card/list`. Verbs: `GET`
+- Set default card of one customer: `/api/stripe/default`. Verbs: `POST`
 
-```
-{
-    "email": "testuser@gmail.com",
-    "password": "password"
-}
-```
-
-If authenticated, the response should be like:
-
-```
-{
-    "first_name": "Test",
-    "localId": <localId>,
-    "idToken": <idToken>,
-    "refreshToken": <refreshToken>
-}
-```
+#### Payment - Charge
+- Create a charge: `/api/stripe/charge/add`. Verbs: `POST`
+- Get a charge info: `/api/stripe/charge`. Verbs: `GET`
+- Recent transactions: `/api/stripe/transaction`. Verbs: `GET`
+- Add a refund: `/api/stripe/refund/add`. Verbs: `POST`
+- Get a refund info: `/api/stripe/refund`. Verbs: `GET`
 
 ### Reference
 1. [Django Restframework](https://www.django-rest-framework.org)
 2. [Django Documentation](https://docs.djangoproject.com/en/3.0/)
 3. [Pyrebase](https://github.com/thisbejim/Pyrebase)
 4. [Installation & Setup for Firebase REST API](https://firebase.google.com/docs/database/rest/start)
-
+5. [Stripe API Doc](https://stripe.com/docs/api)
