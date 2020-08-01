@@ -103,7 +103,26 @@ def add_card(request):
 
 @csrf_exempt
 def card(request):
-    pass
+    data = json.loads(request.body)
+    customer_id = data.get('customer_id')
+    source_id = data.get('source_id')
+
+    if request.method == 'GET':
+        response = stripe.Source.retrieve(source_id)
+
+        return JsonResponse(response.get('card'), status=status.HTTP_200_OK)
+
+    if request.method == 'POST':
+        card = data.get('card')
+
+        stripe.Source.modify(source_id, card=card)
+
+        return JsonResponse({'message': "Update successfully!"}, status=status.HTTP_200_OK)
+
+    if request.method == 'DELETE':
+        stripe.Customer.delete_source(customer_id, source_id)
+
+        return JsonResponse({'message': "Delete successfully!"}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
