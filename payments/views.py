@@ -72,7 +72,33 @@ def customers(request):
 
 @csrf_exempt
 def add_card(request):
-    pass
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        customer_id = data.get('customer_id')
+        card = data.get('card')
+        owner = data.get('owner')
+
+        # create source object
+        created_source = stripe.Source.create(
+            type='card',
+            currency='usd',
+            owner=owner,
+            card=card
+        )
+
+        source_id = created_source['id']
+        fingerprint = created_source.get('card').get('fingerprint')
+        brand = created_source.get('card').get('brand')
+        last4 = created_source.get('card').get('last4')
+
+        # link created source to existed customer
+        stripe.Customer.create_source(
+            customer_id,
+            source=source_id
+        )
+
+        return JsonResponse({'source_id': source_id, 'fingerprint': fingerprint,
+                             'brand': brand, 'last4': last4}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
