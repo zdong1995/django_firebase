@@ -216,7 +216,30 @@ def charge(request):
 
 @csrf_exempt
 def transaction(request):
-    pass
+    data = json.loads(request.body)
+    customer_id = data.get('customer_id')
+    limit = data.get("number_of_recent")
+
+    if request.method == 'GET':
+        charges = stripe.Charge.list(customer=customer_id, limit=int(limit))
+
+        response = {"Number of Orders": len(charges["data"])}
+
+        i = 1
+
+        for charge in charges["data"]:
+            dict = {}
+            dict["amount"] = charge["amount"]
+            dict["currency"] = charge["currency"]
+            dict["charge_id"] = charge["id"]
+            card = charge["payment_method_details"]["card"]
+            dict["payment_method"] = {"card_type": card["brand"], "last 4": card["last4"]}
+            dict["time_stamp"] = charge["created"]
+
+            response["charge" + str(i)] = dict
+            i += 1
+
+        return JsonResponse(response, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
