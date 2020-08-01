@@ -244,9 +244,39 @@ def transaction(request):
 
 @csrf_exempt
 def add_refund(request):
-    pass
+    data = json.loads(request.body)
+    charge_id = data.get('charge_id')
+
+    if request.method == 'POST':
+
+        try:
+            response = stripe.Refund.create(charge=charge_id)
+        except:
+            message = "Order has already been refunded."
+            return JsonResponse({'message': message}, status=status.HTTP_404_NOT_FOUND)
+
+        dict = {}
+        dict["refund_id"] = response["id"]
+        dict["status"] = response["status"]
+        dict["amount"] = response["amount"]
+        dict["currency"] = response["currency"]
+
+        return JsonResponse(dict, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
 def refund(request):
-    pass
+    data = json.loads(request.body)
+    refund_id = data.get('refund_id')
+
+    if request.method == 'GET':
+        response = stripe.Refund.retrieve(refund_id)
+
+        dict = {}
+        dict["status"] = response["status"]
+        dict["amount"] = response["amount"]
+        dict["currency"] = response["currency"]
+        dict["time_stamp"] = response["created"]
+        dict["charge_id"] = response["charge"]
+
+        return JsonResponse(dict, status=status.HTTP_200_OK)
