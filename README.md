@@ -24,14 +24,6 @@ Make sure you are in the same directory as `manage.py`, then run the following t
 2. Then run `python manage.py migrate` to write the migrations to the database schema.
 3. To boot the development server and use the API, run `python manage.py runserver`. 
 
-### Creating an Admin User
-
-Follow these steps to create a Django admin (superuser) user account, for the Django admin interface:
-1. Activate your virtualenv.
-2. `cd` into the `Neer-Algorithm` directory, where `manage.py` is located.
-3. Run `python manage.py createsuperuser`, and enter appropriate values into the prompts.
-4. To access the admin web interface, run `python manage.py runserver` to boot the dev server, and then navigate to `localhost:8000/admin` in your web browser.
-
 ### API Endpoints
 
 
